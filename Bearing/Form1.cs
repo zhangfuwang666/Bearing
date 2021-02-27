@@ -74,41 +74,96 @@ namespace Bearing
         }
         private static void DrawDwg(double a,double b,double daD,double r)
         {
+
+           
             string sLocalRoot = Application.GetSystemVariable("LOCALROOTPREFIX") as string;
             string sTemplatePath = sLocalRoot + "Template\\acad.dwt";
             Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.Add(sTemplatePath);
+            Database db = doc.Database;
             Editor ed = doc.Editor;
             using (DocumentLock docLock = doc.LockDocument())
             {
                 using (var trans = doc.TransactionManager.StartTransaction())
                 {
+                    Tools.AddLayer(db, "Contour_Layer", 7, "Continuous", "外轮廓图层");
+                    Tools.AddLayer(db, "CenterLine_Layer", 1, "CENTER", "中心线图层");
+
                     BlockTable blockTable = trans.GetObject(doc.Database.BlockTableId, OpenMode.ForRead) as BlockTable;
                     BlockTableRecord space = trans.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                     //外框
                     Polyline waiKuang = new Polyline();
-                    waiKuang.AddVertexAt(waiKuang.NumberOfVertices,new Point2d(-b/2, daD / 2-r),0,0,0);//左上角边框 ，顺时针
+                    waiKuang.AddVertexAt(waiKuang.NumberOfVertices,new Point2d(-b/2, daD / 2-r),-Math.PI/8,0,0);//左上角边框 ，顺时针
                     waiKuang.AddVertexAt(waiKuang.NumberOfVertices,new Point2d(-b/2+r,daD/2),0,0,0);
-                    waiKuang.AddVertexAt(waiKuang.NumberOfVertices,new Point2d(b/2-r,daD/2),0,0,0);
+                    waiKuang.AddVertexAt(waiKuang.NumberOfVertices,new Point2d(b/2-r,daD/2), -Math.PI / 8, 0,0);
                     waiKuang.AddVertexAt(waiKuang.NumberOfVertices,new Point2d(b/2,daD/2-r),0,0,0);
-                    waiKuang.AddVertexAt(waiKuang.NumberOfVertices,new Point2d(b/2,-(daD/2-r)),0,0,0);//右下
+                    waiKuang.AddVertexAt(waiKuang.NumberOfVertices,new Point2d(b/2,-(daD/2-r)), -Math.PI / 8, 0,0);//右下
                     waiKuang.AddVertexAt(waiKuang.NumberOfVertices, new Point2d(b / 2 - r, -(daD / 2)), 0, 0, 0);
-                    waiKuang.AddVertexAt(waiKuang.NumberOfVertices, new Point2d(-(b / 2 - r), -(daD / 2)), 0, 0, 0);
+                    waiKuang.AddVertexAt(waiKuang.NumberOfVertices, new Point2d(-(b / 2 - r), -(daD / 2)), -Math.PI / 8, 0, 0);
                     waiKuang.AddVertexAt(waiKuang.NumberOfVertices, new Point2d(-(b / 2), -(daD / 2-r)), 0, 0, 0);
                     waiKuang.Closed = true;
-
+                    waiKuang.Layer = "Contour_Layer";
                     //中心线
                     Line centerLine = new Line(new Point3d(-b/2-2,0,0), new Point3d(b / 2 + 2, 0, 0));
+                    centerLine.Layer = "CenterLine_Layer";
+                    centerLine.LinetypeScale = 0.1;
                     //球
                     Circle Qiu = new Circle(new Point3d(0, (daD / 2 - a / 2),0),Vector3d.ZAxis,a/4);
+                    Qiu.Layer = "Contour_Layer";
                     //球中心线
                     Line centerLine1 = new Line(new Point3d(-b / 2 - 2, (daD / 2 - a / 2), 0), new Point3d(b / 2 + 2, (daD / 2 - a / 2), 0));
+                    centerLine1.Layer = "CenterLine_Layer";
+                    centerLine1.LinetypeScale = 0.1;
                     //竖着
                     Line centerLine2 = new Line(new Point3d(0, (daD/2-a/2)+(a/2+2), 0), new Point3d(0, (daD / 2 - a / 2) - (a / 2 + 2), 0));
+                    centerLine2.Layer = "CenterLine_Layer";
+                    centerLine2.LinetypeScale = 0.1;
+                    //下面十字横着
+                    Line centerLine3 = new Line(new Point3d(-b / 2 + 1, -(daD / 2 - a / 2), 0), new Point3d(b / 2 - 1, -(daD / 2 - a / 2), 0));
+                    //下面十字竖着
+                    centerLine3.Layer = "Contour_Layer";
+                    Line centerLine4 = new Line(new Point3d(0, -(daD / 2 - a / 2) + (a / 2-1), 0), new Point3d(0, -(daD / 2 - a / 2) - (a / 2-1), 0));
+                    centerLine4.Layer = "Contour_Layer";
 
-                    //下面横着
-                    Line centerLine3 = new Line(new Point3d(-b / 2 + 2, (daD / 2 - a / 2), 0), new Point3d(b / 2 - 2, (daD / 2 - a / 2), 0));
-                    //下面竖着
-                    Line centerLine4 = new Line(new Point3d(0, -((daD / 2 - a / 2) + (a / 2 - 2)), 0), new Point3d(0, -((daD / 2 - a / 2) - (a / 2 - 2)), 0));
+                    //下孔轮廓
+                    Polyline kongLunKuoXia = new Polyline();
+                    kongLunKuoXia.AddVertexAt(kongLunKuoXia.NumberOfVertices,new Point2d(-b/2, -(daD - 2 * a) / 2-r), -Math.PI / 8, 0,0);
+                    kongLunKuoXia.AddVertexAt(kongLunKuoXia.NumberOfVertices,new Point2d(-b/2+r, -(daD - 2 * a) / 2),0,0,0);
+                    kongLunKuoXia.AddVertexAt(kongLunKuoXia.NumberOfVertices,new Point2d(b/2-r, -(daD - 2 * a) / 2), -Math.PI / 8, 0, 0);
+                    kongLunKuoXia.AddVertexAt(kongLunKuoXia.NumberOfVertices,new Point2d(b/2, -(daD - 2 * a) / 2-r),0,0,0);
+
+                    Polyline kongLunKuoShang =(Polyline) kongLunKuoXia.GetTransformedCopy(Matrix3d.Mirroring(new Plane(Point3d.Origin,Vector3d.YAxis)));
+
+                    //圆珠截取点
+
+                    double x = a / 4 * Math.Cos(Math.PI / 6);
+                    double y = a / 4 * Math.Sin(Math.PI / 6);
+                    Line line1 = new Line(new Point3d(x, daD / 2 - a / 2 + y,0), new Point3d(b/2, daD / 2 - a / 2 + y, 0));
+                    Line line2 = new Line(new Point3d(x, daD / 2 - a / 2 - y,0), new Point3d(b/2, daD / 2 - a / 2 - y, 0));
+
+                    Line line3 = new Line(new Point3d(-x, daD / 2 - a / 2 + y, 0), new Point3d(-b / 2, daD / 2 - a / 2 + y, 0));
+                    Line line4 = new Line(new Point3d(-x, daD / 2 - a / 2 - y, 0), new Point3d(-b / 2, daD / 2 - a / 2 - y, 0));
+                    line1.Layer = "Contour_Layer";
+                    line2.Layer = "Contour_Layer";
+                    line3.Layer = "Contour_Layer";
+                    line4.Layer = "Contour_Layer";
+
+                    space.AppendEntity(line1);
+                    trans.AddNewlyCreatedDBObject(line1, true);
+                    space.AppendEntity(line2);
+                    trans.AddNewlyCreatedDBObject(line2, true);
+                    space.AppendEntity(line3);
+                    trans.AddNewlyCreatedDBObject(line3, true);
+                    space.AppendEntity(line4);
+                    trans.AddNewlyCreatedDBObject(line4, true);
+
+                    kongLunKuoXia.Layer = "Contour_Layer";
+                    kongLunKuoShang.Layer = "Contour_Layer";
+
+                    space.AppendEntity(kongLunKuoShang);
+                    trans.AddNewlyCreatedDBObject(kongLunKuoShang, true);
+
+                    space.AppendEntity(kongLunKuoXia);
+                    trans.AddNewlyCreatedDBObject(kongLunKuoXia, true);
 
                     space.AppendEntity(centerLine3);
                     trans.AddNewlyCreatedDBObject(centerLine3, true);

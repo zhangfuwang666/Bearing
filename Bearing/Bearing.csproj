@@ -32,15 +32,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCoreMgd">
-      <HintPath>..\..\..\..\..\..\ObjectARX 2016\inc\AcCoreMgd.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Autodesk\Autodesk_ObjectARX_2018_Win_64_and_32_Bit\inc\AcCoreMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AcDbMgd">
-      <HintPath>..\..\..\..\..\..\ObjectARX 2016\inc\AcDbMgd.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Autodesk\Autodesk_ObjectARX_2018_Win_64_and_32_Bit\inc\AcDbMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AcMgd">
-      <HintPath>..\..\..\..\..\..\ObjectARX 2016\inc\AcMgd.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Autodesk\Autodesk_ObjectARX_2018_Win_64_and_32_Bit\inc\AcMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
