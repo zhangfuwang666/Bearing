@@ -108,5 +108,34 @@ namespace Bearing
             }
             return layerTable[layerName];
         }
+        public static List<Region> CreaterRegion(params Curve[] curves)
+        {
+            List<Region> regions = new List<Region>();
+            DBObjectCollection dBObjectCollection = new DBObjectCollection();
+            foreach (var cur in curves)
+            {
+                if (!cur.IsNewObject&&cur.IsWriteEnabled)
+                {
+                    return null;
+
+                }
+                dBObjectCollection.Add(cur);
+            }
+            try
+            {
+                DBObjectCollection regionCloc = Region.CreateFromCurves(dBObjectCollection);
+                foreach (Region reg in regionCloc)
+                {
+                    regions.Add(reg);
+                }
+                return regions;
+            }
+            catch (Exception)
+            {
+
+                regions.Clear();
+                return regions;
+            }
+        }
     }
 }
