@@ -144,11 +144,11 @@ namespace Bearing
             {
                 DimStyleTableRecord record = new DimStyleTableRecord();
                 record.Name = DimName;
-                record.Dimasz = 30;
-                record.Dimtxt = 50;
+                record.Dimasz = 0.5;
+                record.Dimtxt = 0.5;
                 record.Dimtad = 1;
-                record.Dimdec = 0;
-                record.Dimtad = 2;
+                record.Dimdec = 3;
+                record.Dimtad = 1;
                 //文字
                 record.Dimtih = false;
                 record.Dimtoh = false;

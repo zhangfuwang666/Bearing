@@ -229,18 +229,18 @@ namespace Bearing
 
 
                     //标注
-                    addHorizonRotatedDimension(db, new Point3d(-b / 2, daD / 2, 0), new Point3d(b / 2, daD / 2, 0), 4,DimstyleId);
-                    addHorizonRotatedDimension(db, new Point3d(0, daD / 2, 0), new Point3d(b / 2, daD / 2, 0), 2, DimstyleId);
+                    addHorizonRotatedDimension(db, new Point3d(-b / 2, daD / 2, 0), new Point3d(b / 2, daD / 2, 0), 1.5,DimstyleId);
+                    addHorizonRotatedDimension(db, new Point3d(0, daD / 2, 0), new Point3d(b / 2, daD / 2, 0), 0.5, DimstyleId);
 
-                    addVerticalRotatedDimension(db, new Point3d(-b / 2, -(daD - 2 * a) / 2, 0), new Point3d(-b / 2, (daD - 2 * a) / 2, 0), -1, DimstyleId);
-                    addVerticalRotatedDimension(db, new Point3d(-b / 2, daD / 2, 0), new Point3d(-b / 2, (daD - 2 * a) / 2, 0), -1, DimstyleId);
+                    addVerticalRotatedDimension(db, new Point3d(-b / 2, -(daD - 2 * a) / 2, 0), new Point3d(-b / 2, (daD - 2 * a) / 2, 0), -1.5, DimstyleId);
+                    addVerticalRotatedDimension(db, new Point3d(-b / 2, daD / 2, 0), new Point3d(-b / 2, (daD - 2 * a) / 2, 0), -1.5, DimstyleId);
                     addVerticalRotatedDimension(db, new Point3d(-b / 2, daD / 2 - a / 2 - y, 0), new Point3d(-b / 2, daD / 2 - a / 2 + y, 0), -0.5, DimstyleId);
 
 
-                    addVerticalRotatedDimension(db, new Point3d(b / 2, daD / 2, 0), new Point3d(b / 2, daD / 2 - a / 2, 0), 0.5, DimstyleId);
-                    addVerticalRotatedDimension(db, new Point3d(b / 2, daD / 2, 0), new Point3d(b / 2, -daD / 2, 0), 1, DimstyleId);
+                    addVerticalRotatedDimension(db, new Point3d(b / 2, daD / 2, 0), new Point3d(b / 2, daD / 2 - a / 2, 0), 1, DimstyleId);
+                    addVerticalRotatedDimension(db, new Point3d(b / 2, daD / 2, 0), new Point3d(b / 2, -daD / 2, 0), 2, DimstyleId);
 
-                    addDiametricDimension(db, new Point3d(0, daD / 2 - a / 2, 0), new Point3d(0, daD / 2 - a / 2, 0), new Point3d(0, daD / 2 - a, 0), new Point3d(-x, daD / 2 - a / 2 - y, 0), 5, DimstyleId);
+                    addDiametricDimension(db, new Point3d(0, daD / 2 - a / 2, 0), new Point3d(0, daD / 2 - a / 2, 0), new Point3d(0, daD / 2 - a, 0), new Point3d(-x, daD / 2 - a / 2 - y, 0), 0.2, DimstyleId);
 
                     var id7 = space.AppendEntity(line1);
                     trans.AddNewlyCreatedDBObject(line1, true);
@@ -338,7 +338,10 @@ namespace Bearing
                 dimLineAngular.XLine2Start = start2;
                 dimLineAngular.XLine1End = end1;
                 dimLineAngular.XLine2End = end2;
-                dimLineAngular.TextPosition = new Point3d((end1.X + end2.X) / 2, (end1.Y + end2.Y) / 2, (end1.Z + end2.Z) / 2);
+                Vector3d vector3D1 = start1.GetVectorTo(end1);
+                Vector3d vector3D2 = start2.GetVectorTo(end2);
+                Vector3d vector3D = vector3D1 + vector3D2;
+                dimLineAngular.TextPosition = new Point3d((end1.X + end2.X) / 2, (end1.Y + end2.Y) / 2, (end1.Z + end2.Z) / 2).TransformBy(Matrix3d.Displacement(vector3D * distance)); ;
 
                 dimLineAngular.DimensionStyle= dimid;
                 dimLineAngular.Layer= "Dim_Layer";
