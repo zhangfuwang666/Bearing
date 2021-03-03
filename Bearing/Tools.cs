@@ -137,5 +137,28 @@ namespace Bearing
                 return regions;
             }
         }
+        public static ObjectId AddDimStyle(Database db, string DimName)//添加标注样式
+        {
+            DimStyleTable table = (DimStyleTable)db.DimStyleTableId.GetObject(OpenMode.ForRead);
+            if (!table.Has(DimName))
+            {
+                DimStyleTableRecord record = new DimStyleTableRecord();
+                record.Name = DimName;
+                record.Dimasz = 30;
+                record.Dimtxt = 50;
+                record.Dimtad = 1;
+                record.Dimdec = 0;
+                record.Dimtad = 2;
+                //文字
+                record.Dimtih = false;
+                record.Dimtoh = false;
+                record.Dimtxtdirection = false;
+                table.UpgradeOpen();
+                table.Add(record);
+                db.TransactionManager.AddNewlyCreatedDBObject(record, true);
+                table.DowngradeOpen();
+            }
+            return table[DimName];
+        }
     }
 }

@@ -88,6 +88,8 @@ namespace Bearing
                     Tools.AddLayer(db, "Contour_Layer", 7, "Continuous", "外轮廓图层");
                     Tools.AddLayer(db, "Dim_Layer", 7, "Continuous", "外轮廓图层");
                     Tools.AddLayer(db, "CenterLine_Layer", 1, "CENTER", "中心线图层");
+                    var DimstyleId=  Tools.AddDimStyle(db,"myDimStyle");
+ 
 
                     BlockTable blockTable = trans.GetObject(doc.Database.BlockTableId, OpenMode.ForRead) as BlockTable;
                     BlockTableRecord space = trans.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
@@ -227,18 +229,18 @@ namespace Bearing
 
 
                     //标注
-                    addHorizonRotatedDimension(db, new Point3d(-b / 2, daD / 2, 0), new Point3d(b / 2, daD / 2, 0), 4);
-                    addHorizonRotatedDimension(db, new Point3d(0, daD / 2, 0), new Point3d(b / 2, daD / 2, 0), 2);
+                    addHorizonRotatedDimension(db, new Point3d(-b / 2, daD / 2, 0), new Point3d(b / 2, daD / 2, 0), 4,DimstyleId);
+                    addHorizonRotatedDimension(db, new Point3d(0, daD / 2, 0), new Point3d(b / 2, daD / 2, 0), 2, DimstyleId);
 
-                    addVerticalRotatedDimension(db, new Point3d(-b / 2, -(daD - 2 * a) / 2, 0), new Point3d(-b / 2, (daD - 2 * a) / 2, 0), -1);
-                    addVerticalRotatedDimension(db, new Point3d(-b / 2, daD / 2, 0), new Point3d(-b / 2, (daD - 2 * a) / 2, 0), -1);
-                    addVerticalRotatedDimension(db, new Point3d(-b / 2, daD / 2 - a / 2 - y, 0), new Point3d(-b / 2, daD / 2 - a / 2 + y, 0), -0.5);
+                    addVerticalRotatedDimension(db, new Point3d(-b / 2, -(daD - 2 * a) / 2, 0), new Point3d(-b / 2, (daD - 2 * a) / 2, 0), -1, DimstyleId);
+                    addVerticalRotatedDimension(db, new Point3d(-b / 2, daD / 2, 0), new Point3d(-b / 2, (daD - 2 * a) / 2, 0), -1, DimstyleId);
+                    addVerticalRotatedDimension(db, new Point3d(-b / 2, daD / 2 - a / 2 - y, 0), new Point3d(-b / 2, daD / 2 - a / 2 + y, 0), -0.5, DimstyleId);
 
 
-                    addVerticalRotatedDimension(db, new Point3d(b / 2, daD / 2, 0), new Point3d(b / 2, daD / 2 - a / 2, 0), 0.5);
-                    addVerticalRotatedDimension(db, new Point3d(b / 2, daD / 2, 0), new Point3d(b / 2, -daD / 2, 0), 1);
+                    addVerticalRotatedDimension(db, new Point3d(b / 2, daD / 2, 0), new Point3d(b / 2, daD / 2 - a / 2, 0), 0.5, DimstyleId);
+                    addVerticalRotatedDimension(db, new Point3d(b / 2, daD / 2, 0), new Point3d(b / 2, -daD / 2, 0), 1, DimstyleId);
 
-                    addDiametricDimension(db, new Point3d(0, daD / 2 - a / 2, 0), new Point3d(0, daD / 2 - a / 2, 0), new Point3d(0, daD / 2 - a, 0), new Point3d(-x, daD / 2 - a / 2 - y, 0), 5);
+                    addDiametricDimension(db, new Point3d(0, daD / 2 - a / 2, 0), new Point3d(0, daD / 2 - a / 2, 0), new Point3d(0, daD / 2 - a, 0), new Point3d(-x, daD / 2 - a / 2 - y, 0), 5, DimstyleId);
 
                     var id7 = space.AppendEntity(line1);
                     trans.AddNewlyCreatedDBObject(line1, true);
@@ -285,7 +287,7 @@ namespace Bearing
 
             }
         }
-        public static void addHorizonRotatedDimension(Database db, Point3d pt1, Point3d pt2, double distance)
+        public static void addHorizonRotatedDimension(Database db, Point3d pt1, Point3d pt2, double distance, ObjectId dimid)
         {
             using (Transaction trans = db.TransactionManager.StartOpenCloseTransaction())
             {
@@ -296,7 +298,7 @@ namespace Bearing
                 dimRotated.XLine2Point = pt2;
                // dimRotated.DimLinePoint = new Point3d((pt1.X + pt2.X), (pt1.Y + pt2.Y), (pt1.Z + pt2.Z)).TransformBy(Matrix3d.Displacement(Vector3d.YAxis * distance)); ;
                 //dimRotated.DimensionText = text;//<>代表標注的主尺寸，此處在標注線上插入文字
-                dimRotated.DimensionStyle = db.Dimstyle;
+                dimRotated.DimensionStyle= dimid;
                 dimRotated.Layer = "Dim_Layer";
                 dimRotated.TextPosition= new Point3d((pt1.X + pt2.X)/2, (pt1.Y + pt2.Y)/2, (pt1.Z + pt2.Z)/2).TransformBy(Matrix3d.Displacement(Vector3d.YAxis * distance)); ;
                 space.AppendEntity(dimRotated);
@@ -304,7 +306,7 @@ namespace Bearing
                 trans.Commit();
             }
         }
-        public static void addVerticalRotatedDimension(Database db, Point3d pt1, Point3d pt2, double distance)
+        public static void addVerticalRotatedDimension(Database db, Point3d pt1, Point3d pt2, double distance, ObjectId dimid)
         {
             using (Transaction trans = db.TransactionManager.StartOpenCloseTransaction())
             {
@@ -318,13 +320,13 @@ namespace Bearing
 
                 dimRotated.DimLinePoint = new Point3d((pt1.X + pt2.X)/2, (pt1.Y + pt2.Y)/2, (pt1.Z + pt2.Z)/2).TransformBy(Matrix3d.Displacement(Vector3d.XAxis * distance));
                 dimRotated.Layer = "Dim_Layer";
-                dimRotated.DimensionStyle = db.Dimstyle;
+                dimRotated.DimensionStyle = dimid;
                 space.AppendEntity(dimRotated);
                 trans.AddNewlyCreatedDBObject(dimRotated, true);
                 trans.Commit();
             }
         }
-        public static void addDiametricDimension(Database db, Point3d start1, Point3d start2, Point3d end1, Point3d end2, double distance)
+        public static void addDiametricDimension(Database db, Point3d start1, Point3d start2, Point3d end1, Point3d end2, double distance,ObjectId dimid)
         {
             using (Transaction trans = db.TransactionManager.StartOpenCloseTransaction())
             {
@@ -338,7 +340,7 @@ namespace Bearing
                 dimLineAngular.XLine2End = end2;
                 dimLineAngular.TextPosition = new Point3d((end1.X + end2.X) / 2, (end1.Y + end2.Y) / 2, (end1.Z + end2.Z) / 2);
 
-                dimLineAngular.DimensionStyle = db.Dimstyle;
+                dimLineAngular.DimensionStyle= dimid;
                 dimLineAngular.Layer= "Dim_Layer";
                 space.AppendEntity(dimLineAngular);
                 trans.AddNewlyCreatedDBObject(dimLineAngular, true);
